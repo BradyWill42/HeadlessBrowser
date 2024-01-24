@@ -1,0 +1,15 @@
+{
+  "name": "headlessbrowser",
+  "version": "1.0.0",
+  "description": "JJTEST",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "puppeteer": "^21.6.1",
+    "xlsx": "^0.18.5"
+  }
+}
