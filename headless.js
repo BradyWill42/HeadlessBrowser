@@ -30,16 +30,21 @@ let emailTemplate = "Send Out Returns, Bill, and Efile Sigs - InvoiceInTd";
 // let emailTemplate = "Test CRM Code";
 const timeout = 3000;
 const year = 2022;
+
+
 const estimate = "Estimate";
 const taxReturn = "Tax Return";
 const signature = "Signature";
 const invoice = "Invoice";
+const clientUpload = "Client uploaded documents";
 
+const sealExcel = "Seal"
 const estimateExcel = "Estimate";
 const taxReturnExcel = "TaxReturn";
 const signatureExcel = "Signature";
 const invoiceExcel = "Invoice";
 const closerExcel = "Closer";
+const sealYearExcel = "YearToSeal";
 
 
 const screenResolution = { width: 1500, height: 800 }; // Replace with your screen's resolution
@@ -53,8 +58,8 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#email', 'youremailhere');
-      await page.type('input#password', 'yourpasswordhere');
+      await page.type('input#email', 'will2828@purdue.edu');
+      await page.type('input#password', '$zM{8$;@Z<+8@O=UU;><');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
       console.error(error);
@@ -341,6 +346,68 @@ async function closer(page, i){
     console.log("No closer selected.");
     clientArray[i][closerExcel] = "N";
     return false;
+  }
+}
+
+async function seal(page, i){
+
+  console.log("Begin Seal for " + clientArray[i].ClientName);
+  sealClient = clientArray[i][sealExcel];
+  
+
+  if(sealClient == null || sealClient.toLocaleLowerCase() != "none"){
+    try{
+      // Navigate to Client Documents
+      await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/documents');
+            
+      // Wait for and click the folder corresponding to the specified year
+      await page.waitForSelector(`span[title='${clientUpload}']`);
+      await page.click(`span[title='${clientUpload}']`);
+
+      // Delay for 3 seconds (3000 milliseconds)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    
+      const elementsDetails = await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('input.checkbox__input'));
+        return buttons.map((button, index) => {
+            const grandparent = button.parentElement ? button.parentElement.parentElement.parentElement : null;
+            return {
+                index: index,
+                grandparentText: grandparent.textContent.trim(),
+                grandparentHtml: grandparent ? grandparent.outerHTML : 'No grandparent'
+            };
+        });
+      });
+
+      console.log(elementsDetails);
+
+      //click checkbox of Client Upload
+      const clientUploadIndex = elementsDetails.findIndex(element => element.grandparentText.includes(clientArray[i][sealYearExcel] + " Client Upload"));
+      console.log(clientUploadIndex);
+      if (clientUploadIndex !== -1) {
+          await page.evaluate((index) => {
+              const buttons = Array.from(document.querySelectorAll('input.checkbox__input'));
+              if (buttons[index]) {
+                  buttons[index].click();
+                  console.log(`Checkbox clicked.`);
+              }
+          }, clientUploadIndex);
+          clientArray[i][sealExcel] = "Y";
+      } else {
+          console.log(`Checkbox not found`);
+          clientArray[i][sealExcel] = "N";
+          return false;
+      }
+
+
+      // Seal the folder
+      await page.waitForSelector(`button[title='Seal documents to prevent the changes from a client']`);
+      await page.click(`button[title='Seal documents to prevent the changes from a client']`);
+      
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 }
 
@@ -809,6 +876,7 @@ async function main() {
       const documentsCheck = await sendOutDocuments(page, i);
       const invoiceCheck = await sendOutInvoices(page, i);
       const closerCheck = await closer(page, i);
+      const sealCheck = await seal(page, i);
 
       // if(emailCheck){
       //   clientArray[i].EmailSent = "Y";
