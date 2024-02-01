@@ -27,8 +27,9 @@ XLSX.writeFile(clientBook, excelPath);
 
 const breakPoint = "----------------------------------------------------------------------------------";
 let emailTemplate = "Send Out Returns, Bill, and Efile Sigs - InvoiceInTd";
+const commentTemplate = "2023 Tax Return Final Email - JJ";
 // let emailTemplate = "Test CRM Code";
-const timeout = 3000;
+const timeout = 5000;
 const year = 2022;
 
 
@@ -39,6 +40,7 @@ const invoice = "Invoice";
 const clientUpload = "Client uploaded documents";
 
 const sealExcel = "Seal"
+const commentExcel = "Comment";
 const estimateExcel = "Estimate";
 const taxReturnExcel = "TaxReturn";
 const signatureExcel = "Signature";
@@ -105,8 +107,10 @@ async function sendOutEmail(page, i){
             await page.type('input#subject-input', " Email " + i);
             await new Promise(resolve => setTimeout(resolve, 2000)); //2 sec delay
           }
-          
-          await page.keyboard.press('Enter');
+
+          await page.waitForSelector('button[data-test="save-button"][type="submit"]');
+          await page.click('button[data-test="save-button"][type="submit"]');
+
           await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for 5000 milliseconds (5 seconds)
           
           console.log("Email Sent.");
@@ -131,6 +135,62 @@ async function sendOutEmail(page, i){
     
   }
   console.log("EMAIL SEND COMPLETE");
+
+}
+
+async function sendComment(page, i){
+  console.log("SEND COMMENT TO CLIENT");
+
+  const setup = await precheck(page, i);
+
+  console.log("Checking Comment Column for template");
+  
+  commentTemp = clientArray[i][commentExcel];
+
+  if(commentTemp == null || commentTemp.toLocaleLowerCase() != 'none'){
+    try{ //Send Email
+      if(setup === clientArray[i].ClientName){ //check names match
+        console.log("Names Match.");
+        console.log("Sending Email...");
+        await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
+        await page.waitForSelector('div.block-container .btn');
+        await page.click('div.block-container .btn');
+  
+        await page.waitForSelector('input#react-select-4-input');
+        await page.type('input#react-select-4-input', commentTemplate);
+  
+        await new Promise(resolve => setTimeout(resolve, 1000)); //1 sec delay
+        await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 1000)); //1 sec delay
+  
+  
+        await page.waitForSelector("div.ql-editor");
+        await page.click("div.ql-editor");
+        await page.type("div.ql-editor", commentTemp);
+
+        await new Promise(resolve => setTimeout(resolve, 2000)); //2 sec delay
+
+        await page.waitForSelector('button[data-test="save-button"][type="submit"]');
+        await page.click('button[data-test="save-button"][type="submit"]');
+
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for 5000 milliseconds (5 seconds)
+        
+        console.log("Comment Sent.");
+        clientArray[i][commentExcel] = "Y";
+        return true;
+      } else {
+        console.log(clientArray[i].ClientName + " does not match ClientID.");
+        console.log("Moving to next client...");
+        clientArray[i][commentExcel] = "N";
+        return false;
+      }
+    } catch (error) { //catch case if email is not send or error occurs
+      console.log("Comment Send Failed.");
+      console.error(error);
+      clientArray[i][commentExcel] = "N";
+      return false;
+    }
+  }
 
 }
 
@@ -700,7 +760,7 @@ async function requestSignatures(page, i, titles, keyword, excelText){
       console.error(error);
 
       clientArray[i][requireKBAExcel] = "N";
-      
+
 
       return false;
     }
@@ -899,6 +959,7 @@ async function main() {
       console.log(clientArray[i].ClientName + ": ")
 
       const emailCheck = await sendOutEmail(page, i);
+      const commentCheck = await sendComment(page, i);
       const documentsCheck = await sendOutDocuments(page, i);
       const invoiceCheck = await sendOutInvoices(page, i);
       const closerCheck = await closer(page, i);
