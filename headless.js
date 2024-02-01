@@ -45,6 +45,7 @@ const signatureExcel = "Signature";
 const invoiceExcel = "Invoice";
 const closerExcel = "Closer";
 const sealYearExcel = "YearToSeal";
+const requireKBAExcel = "RequireKBA";
 
 
 const screenResolution = { width: 1500, height: 800 }; // Replace with your screen's resolution
@@ -666,11 +667,19 @@ async function requestSignatures(page, i, titles, keyword, excelText){
     
       await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
 
-      const requireKBA = xPathClick(page, "//span[@class='toggle__label']");
-      if(!requireKBA){
-        console.log("Require KBA button not located.");
-        return false;
+      kbaOption = clientArray[i][requireKBAExcel]
+      if(kbaOption == null || kbaOption.toLocaleLowerCase() != "none"){
+
+        await page.waitForSelector('span.toggle__label');
+        await page.click('span.toggle__label');
+
+        clientArray[i][requireKBAExcel] = "Y";
+
+      } else {
+        clientArray[i][requireKBAExcel] = "N";
       }
+      
+      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
 
       // Wait for the element with the specified class and text to be available on the page
       await page.waitForSelector('button.btn.m-t-30.full-width.document-page__button'); // Replace with the actual text if needed
@@ -689,6 +698,10 @@ async function requestSignatures(page, i, titles, keyword, excelText){
     } catch (error) { //catch case if signature request fails
       console.log(keyword + " Request Failed.");
       console.error(error);
+
+      clientArray[i][requireKBAExcel] = "N";
+      
+
       return false;
     }
   } else {
