@@ -66,7 +66,7 @@ async function startAndLogin(){
       console.log("Already Logged In.");
       console.log("Continuing to Webpage...");
     }
-    await page.waitForNavigation();  
+    await page.waitForNavigation( {timeout: 120000} );  
     return {browser, page};
 }
 
@@ -649,15 +649,28 @@ async function requestSignatures(page, i, titles, keyword, excelText){
       await page.waitForSelector('a.btn_menu-item[href*="/signature/new?"]');
       await page.click('a.btn_menu-item[href*="/signature/new?"]');
 
-      console.log(keyword + " Template: " + clientArray[i].SignatureTemplate);
-
       await new Promise(resolve => setTimeout(resolve, 5000)); //5 sec delay
+      
+      signatureTemp = clientArray[i].SignatureTemplate
+      if(signature == null || signatureTemp.toLocaleLowerCase() != "none"){
+        console.log(keyword + " Template: " + clientArray[i].SignatureTemplate);
+        await page.waitForSelector('input.react-select__input');
+        await page.type('input.react-select__input', clientArray[i].SignatureTemplate);
 
-      await page.waitForSelector('input.react-select__input');
-      await page.type('input.react-select__input', clientArray[i].SignatureTemplate);
-      await page.keyboard.press('Enter');
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
+        await page.keyboard.press('Enter');
+      } else {
+        console.log("No signature template selected");
+      }
+    
       await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
+      const requireKBA = xPathClick(page, "//span[@class='toggle__label']");
+      if(!requireKBA){
+        console.log("Require KBA button not located.");
+        return false;
+      }
 
       // Wait for the element with the specified class and text to be available on the page
       await page.waitForSelector('button.btn.m-t-30.full-width.document-page__button'); // Replace with the actual text if needed
