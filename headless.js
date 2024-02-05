@@ -293,7 +293,9 @@ async function sendOutInvoices(page, i){
     if(createdInvoice){
       clientArray[i][invoiceExcel] = "Y";
     } else {
-      clientArray[i][invoiceExcel] = "N";
+      if(clientArray[i][invoiceExcel].toLocaleLowerCase() != 'create'){
+        clientArray[i][invoiceExcel] = "N";
+      }
     }
 
     console.log("INVOICE SEND COMPLETE");
@@ -542,7 +544,7 @@ async function findYearDocuments(page, i, year, documentArray) {
 
 async function findYear(page, i, year) {
   invoiceExists = clientArray[i][invoiceExcel];
-  if(invoiceExists == null || invoiceExists.toLocaleLowerCase() !== 'none'){
+  if((invoiceExists == null || invoiceExists.toLocaleLowerCase() != 'none') && invoiceExists.toLocaleLowerCase() != 'create'){
     try {
       // Navigate to Client Documents
       await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/documents');
@@ -887,6 +889,91 @@ async function createInvoice(page, i, invoiceLinked){
   }
 }
 
+async function justCreateInvoice(page, i){
+  console.log("JUST SEND INVOICE");
+  
+  const setup = await precheck(page, i);
+
+  invoiceCreate = clientArray[i].Invoice
+  console.log("invoice create : " + invoiceCreate);
+
+  if(setup === clientArray[i].ClientName){ //check names match
+    if(invoiceCreate.toLocaleLowerCase() == 'create'){
+
+      const newInvioce = xPathClick(page, "//button[text()='New']");
+      if(!newInvioce){
+        console.log("New Button not located");
+        clientArray[i][invoiceExcel] = "N";
+        return false;
+      }
+
+      const invoiceMenu = xPathClick(page, "//span[contains(@class, 'btn__text') and contains(text(), 'Invoice')]/ancestor::button");
+      if(!invoiceMenu){
+        console.log("Invoice Button not located.");
+        clientArray[i][invoiceExcel]  = "N";
+        return false;
+      }
+
+      // await page.waitForSelector('button#bill.btn.btn_plus-new');
+      // await page.waitForSelector('button#bill.btn.btn_plus-new');
+
+      try{
+        console.log("Creating Invoice...");
+        console.log("Choosing " + clientArray[i].InvoiceTemplate + " as invoice template...");
+  
+        //input invoice tempate
+        await page.waitForSelector('.react-select__input');
+        await page.type('.react-select__input', clientArray[i].InvoiceTemplate);
+        await page.keyboard.press('Enter');
+  
+        console.log("Template Chosen.");
+  
+        //navigate to invoice amount
+        await page.waitForSelector('._textareaField_zwyj7_57');
+        await page.click('._textareaField_zwyj7_57');
+        await page.keyboard.press('Tab');
+  
+        //enter invoice amount
+        await page.type('input.simple-input[type="text"][autocapitalize="off"][autocomplete="off"][value="0.00"]', clientArray[i].InvoiceAmount.toString());
+        
+        await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+        // //create invoice
+        // await page.keyboard.press('Enter');
+        // await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+  
+        //Click create
+        const create = xPathClick(page, "//span[contains(@class, 'btn__text') and text()='Create']");
+        if(!create){
+          console.log("Create button not located.");
+          clientArray[i][invoiceExcel] = "N";
+          return false;
+        }
+  
+        //wait for save
+        await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+  
+        console.log('Just Send Invoice Created.');
+
+        clientArray[i][invoiceExcel] = "Y";
+
+        return true;
+  
+      } catch (error) {
+        console.error(error);
+        clientArray[i][invoiceExcel] = "N";
+        return false;
+      }
+
+    } else { // Names don't match, so continue to next client
+
+      console.log(clientArray[i].ClientName + " does not match ClientID.");
+      console.log("Moving to next client...");
+      clientArray[i][invoiceExcel] = "N";
+      return false;
+    }
+  }
+}
+
 async function xPathClick(page, xpath){
   try{
     //click button
@@ -962,6 +1049,7 @@ async function main() {
       const commentCheck = await sendComment(page, i);
       const documentsCheck = await sendOutDocuments(page, i);
       const invoiceCheck = await sendOutInvoices(page, i);
+      const justInvoiceCheck = await justCreateInvoice(page, i);
       const closerCheck = await closer(page, i);
       const sealCheck = await seal(page, i);
 
