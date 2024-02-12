@@ -344,7 +344,7 @@ async function closer(page, i){
 
 
       //click link button
-      const link = xPathClick(page, "//button[.//span[contains(@class, 'btn__text') and text()='Link']]");
+      const link = xPathClick(page, "//button[@data-test='link-button' and contains(text(), 'Link')]");
       if(!link){
         clientArray[i][closerExcel] = "N";
         return false;
@@ -352,7 +352,7 @@ async function closer(page, i){
 
 
       //click document button
-      const documents = xPathClick(page, "//li[contains(@class, 'rc-dropdown-menu-item')]//span[contains(@class, 'btn__text') and contains(text(), 'Documents')]");
+      const documents = xPathClick(page, "//button[.//div[contains(text(), 'Documents')]]");
       if(!documents){
         clientArray[i][closerExcel] = "N"; 
         return false;
