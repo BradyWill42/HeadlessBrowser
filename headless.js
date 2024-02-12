@@ -61,7 +61,7 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#email', 'will2828@purdue.edu');
+      await page.type('input#email', 'will2929@purdue.edu');
       await page.type('input#password', '$zM{8$;@Z<+8@O=UU;><');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
