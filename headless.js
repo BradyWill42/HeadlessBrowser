@@ -384,14 +384,20 @@ async function closer(page, i){
       await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
       
 
-      //submit signature as linked document
-      await page.keyboard.press('Enter');
+
+      const subSignature = xPathClick(page, "//button[@data-test='save-button' and text()='Save']");
+      if(!subSignature){
+        clientArray[i][closerExcel] = "N";
+        return false;
+      }
+
+      const saveAndExit = xPathClick(page, "//button[@data-test='save-and-exit-button' and contains(text(), 'Save & Exit')]");
+      if(!saveAndExit){
+        clientArray[i][closerExcel] = "N";
+        return false;
+      }
 
       await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
-
-      //click save and exit button
-      await page.waitForSelector('button._root_19cba_1._primary_19cba_59');
-      await page.click('button._root_19cba_1._primary_19cba_59');
 
 
       console.log("Signature Page Linked.");
