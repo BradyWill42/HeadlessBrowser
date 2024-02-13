@@ -852,6 +852,9 @@ async function createInvoice(page, i, invoiceLinked){
       //input invoice tempate
       await page.waitForSelector('input#react-select-5-input.react-select__input');
       await page.type('input#react-select-5-input.react-select__input', clientArray[i].InvoiceTemplate);
+
+      await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
+
       await page.keyboard.press('Enter');
 
       console.log("Template Chosen.");
@@ -864,6 +867,8 @@ async function createInvoice(page, i, invoiceLinked){
       //enter invoice amount
       await page.type('input.simple-input[type="text"][autocapitalize="off"][autocomplete="off"][value="0.00"]', clientArray[i].InvoiceAmount.toString());
       
+      await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
+
       //create invoice
       await page.keyboard.press('Enter');
       await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
