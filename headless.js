@@ -464,6 +464,9 @@ async function seal(page, i, setupName){
       // Seal the folder
       await page.waitForSelector(`button[title='Seal documents to prevent the changes from a client']`);
       await page.click(`button[title='Seal documents to prevent the changes from a client']`);
+
+      await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay for waiting for seal
+
       
     } catch (error) {
       console.error(error);
@@ -933,7 +936,7 @@ async function justCreateInvoice(page, i, setupName){
         //enter invoice amount
         await page.type('input.simple-input[type="text"][autocapitalize="off"][autocomplete="off"][value="0.00"]', clientArray[i].InvoiceAmount.toString());
         
-        await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+        await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
         // //create invoice
         // await page.keyboard.press('Enter');
         // await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
