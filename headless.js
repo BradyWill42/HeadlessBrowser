@@ -73,11 +73,9 @@ async function startAndLogin(){
     return {browser, page};
 }
 
-async function sendOutEmail(page, i){
+async function sendOutEmail(page, i, setupName){
 
   console.log("SEND OUT EMAIL");
-
-  const setup = await precheck(page, i);
 
   for (j = 1; j < 3; j++){
     emailTempName = 'EmailTemp' + j;
@@ -87,7 +85,7 @@ async function sendOutEmail(page, i){
     if(emailTemplate.toLocaleLowerCase() != 'none'){
       console.log(emailTemplate + " Selected as Template.");
       try{ //Send Email
-        if(setup === clientArray[i].ClientName){ //check names match
+        if(setupName === clientArray[i].ClientName){ //check names match
           console.log("Names Match.");
           console.log("Sending Email...");
           await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
@@ -138,18 +136,15 @@ async function sendOutEmail(page, i){
 
 }
 
-async function sendComment(page, i){
+async function sendComment(page, i, setupName){
   console.log("SEND COMMENT TO CLIENT");
-
-  const setup = await precheck(page, i);
-
   console.log("Checking Comment Column for template");
   
   commentTemp = clientArray[i][commentExcel];
 
   if(commentTemp == null || commentTemp.toLocaleLowerCase() != 'none'){
     try{ //Send Email
-      if(setup === clientArray[i].ClientName){ //check names match
+      if(setupName === clientArray[i].ClientName){ //check names match
         console.log("Names Match.");
         console.log("Sending Email...");
         await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
@@ -194,13 +189,11 @@ async function sendComment(page, i){
 
 }
 
-async function sendOutDocuments(page, i){
+async function sendOutDocuments(page, i, setupName){
 
   console.log("SEND OUT DOCUMENTS");
   
-  const setup = await precheck(page, i);
-
-  if(setup === clientArray[i].ClientName){ //check names match
+  if(setupName === clientArray[i].ClientName){ //check names match
 
     console.log("Names Match.");
 
@@ -274,13 +267,11 @@ async function sendOutDocuments(page, i){
   
 }
 
-async function sendOutInvoices(page, i){
+async function sendOutInvoices(page, i, setupName){
   
   console.log("SEND OUT INVOICES");
   
-  const setup = await precheck(page, i);
-
-  if(setup === clientArray[i].ClientName){ //check names match
+  if(setupName === clientArray[i].ClientName){ //check names match
 
     console.log("Names Match.");
 
@@ -310,10 +301,10 @@ async function sendOutInvoices(page, i){
   }
 }
 
-async function closer(page, i){
+async function closer(page, i, setupName){
   console.log("BEGIN CLOSER");
   completeCloser = clientArray[i][closerExcel]
-  if(completeCloser == null || completeCloser.toLocaleLowerCase() != 'none'){
+  if( (completeCloser == null || completeCloser.toLocaleLowerCase() != 'none') && setupName === clientArray[i].ClientName ){
     try{ //Ensure Page domain exists
       console.log("Navigate to Jobs Page.");
       await page.goto('https://portal.greenoakfinancial.com/app/jobs/'); // Navigate to Jobs 
@@ -419,13 +410,13 @@ async function closer(page, i){
   }
 }
 
-async function seal(page, i){
+async function seal(page, i, setupName){
 
   console.log("Begin Seal for " + clientArray[i].ClientName);
   sealClient = clientArray[i][sealExcel];
   
 
-  if(sealClient == null || sealClient.toLocaleLowerCase() != "none"){
+  if( (sealClient == null || sealClient.toLocaleLowerCase() != "none") && setupName === clientArray[i].ClientName){
     try{
       // Navigate to Client Documents
       await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/documents');
@@ -896,15 +887,14 @@ async function createInvoice(page, i, invoiceLinked){
   }
 }
 
-async function justCreateInvoice(page, i){
-  console.log("JUST SEND INVOICE");
+async function justCreateInvoice(page, i, setupName){
+  console.log("JUST CREATE INVOICE");
   
-  const setup = await precheck(page, i);
 
   invoiceCreate = clientArray[i].Invoice
   console.log("invoice create : " + invoiceCreate);
 
-  if(setup === clientArray[i].ClientName){ //check names match
+  if(setupName === clientArray[i].ClientName){ //check names match
     if(invoiceCreate.toLocaleLowerCase() == 'create'){
 
       const newInvioce = xPathClick(page, "//button[text()='New']");
@@ -970,14 +960,14 @@ async function justCreateInvoice(page, i){
         clientArray[i][invoiceExcel] = "N";
         return false;
       }
-
-    } else { // Names don't match, so continue to next client
-
-      console.log(clientArray[i].ClientName + " does not match ClientID.");
-      console.log("Moving to next client...");
-      clientArray[i][invoiceExcel] = "N";
-      return false;
-    }
+    } else {
+      console.log("Just Invoice Creation Not Selected.");
+    } 
+  } else {
+    console.log(clientArray[i].ClientName + " does not match ClientID.");
+    console.log("Moving to next client...");
+    clientArray[i][invoiceExcel] = "N";
+    return false;
   }
 }
 
@@ -1052,13 +1042,17 @@ async function main() {
     for(let i = 0; i < clientArray.length; i++){ //loop through all clients in excel file
       console.log(clientArray[i].ClientName + ": ")
 
-      const emailCheck = await sendOutEmail(page, i);
-      const commentCheck = await sendComment(page, i);
-      const documentsCheck = await sendOutDocuments(page, i);
-      const invoiceCheck = await sendOutInvoices(page, i);
-      const justInvoiceCheck = await justCreateInvoice(page, i);
-      const closerCheck = await closer(page, i);
-      const sealCheck = await seal(page, i);
+      const setup = await precheck(page, i);
+
+      if(setup != false){
+        const emailCheck = await sendOutEmail(page, i, setup);
+        const commentCheck = await sendComment(page, i, setup);
+        const documentsCheck = await sendOutDocuments(page, i, setup);
+        const invoiceCheck = await sendOutInvoices(page, i, setup);
+        const justInvoiceCheck = await justCreateInvoice(page, i, setup);
+        const closerCheck = await closer(page, i, setup);
+        const sealCheck = await seal(page, i, setup);
+      }
 
       // if(emailCheck){
       //   clientArray[i].EmailSent = "Y";
