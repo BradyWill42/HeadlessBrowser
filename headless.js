@@ -460,6 +460,7 @@ async function seal(page, i, setupName){
           return false;
       }
 
+      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
 
       // Seal the folder
       await page.waitForSelector(`button[title='Seal documents to prevent the changes from a client']`);
@@ -591,6 +592,9 @@ async function shareMultipleDocuments(page, i, navigated, clickList){
                 };
             });
           });
+
+          await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
           //click vertical ellipsis of signature page
           const signatureButtonIndex = elementsDetails.findIndex(element => element.grandparentText.includes(clickList[j].docName));
           if (signatureButtonIndex !== -1) {
@@ -614,7 +618,7 @@ async function shareMultipleDocuments(page, i, navigated, clickList){
         console.log("Checkbox(es) located and selected.");
         console.log("Sharing document(s)...");
 
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 sec
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Delay for 3 sec
 
         const share = xPathClick(page, "//button[.//span[contains(@class, 'btn__text') and text()='Share']]");
         if(!share){
@@ -682,7 +686,7 @@ async function shareDocument(page, i, titles, keyword){
       console.error(error);
       return false;
     }
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for 3000 milliseconds (3 seconds)
+    await new Promise(resolve => setTimeout(resolve, 5000)); // Delay for 5000 milliseconds (5 seconds)
     return true;
   } else {
     return false;
@@ -706,6 +710,8 @@ async function requestSignatures(page, i, titles, keyword, excelText){
         console.log(keyword + " does not match any elements.")
         return false;
       }
+
+      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
 
       await page.waitForSelector('button.btn.btn_icon[data-test="option-vertical"]');
       await page.click('button.btn.btn_icon[data-test="option-vertical"]');
@@ -804,6 +810,8 @@ async function linkInvoice(page, i, invoiceArrayCreated){
           return false;
       }
 
+      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
       //click edit on dropdown
       const edit = xPathClick(page, `//li[@data-menu-id[contains(translate(., 'EDIT', 'edit'), 'edit')]]`);
       if(!edit){
@@ -862,6 +870,9 @@ async function createInvoice(page, i, invoiceLinked){
       //navigate to invoice amount
       await page.waitForSelector('._textareaField_zwyj7_57');
       await page.click('._textareaField_zwyj7_57');
+
+      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
       await page.keyboard.press('Tab');
 
       //enter invoice amount
@@ -871,7 +882,7 @@ async function createInvoice(page, i, invoiceLinked){
 
       //create invoice
       await page.keyboard.press('Enter');
-      await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+      await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
 
       //Click save
       const save = xPathClick(page, "//button[@data-test='submit-button' and //span[text()='Save']]");
@@ -881,7 +892,7 @@ async function createInvoice(page, i, invoiceLinked){
       }
 
       //wait for save
-      await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+      await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
 
       console.log('Invoice Created.');
       return true;
@@ -944,7 +955,7 @@ async function justCreateInvoice(page, i, setupName){
         await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
         // //create invoice
         // await page.keyboard.press('Enter');
-        // await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+        // await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
   
         //Click create
         const create = xPathClick(page, "//span[contains(@class, 'btn__text') and text()='Create']");
@@ -955,7 +966,7 @@ async function justCreateInvoice(page, i, setupName){
         }
   
         //wait for save
-        await new Promise(resolve => setTimeout(resolve, timeout)); //3 sec delay
+        await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
   
         console.log('Just Send Invoice Created.');
 
