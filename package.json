@@ -9,7 +9,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "puppeteer": "^21.6.1",
+    "puppeteer": "^21.11.0",
     "xlsx": "^0.18.5"
   }
 }

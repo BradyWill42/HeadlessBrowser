@@ -30,7 +30,7 @@ let emailTemplate = "Send Out Returns, Bill, and Efile Sigs - InvoiceInTd";
 const commentTemplate = "2023 Tax Return Final Email - JJ";
 // let emailTemplate = "Test CRM Code";
 const timeout = 5000;
-const year = 2022;
+const year = 2023;
 
 
 const estimate = "Estimate";
@@ -61,8 +61,8 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#email', 'will2828@purdue.edu');
-      await page.type('input#password', '$zM{8$;@Z<+8@O=UU;><');
+      await page.type('input#email', 'jjoconnor@greenoakfinancial.com');
+      await page.type('input#password', '$4g9R1prj%idb3TS');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
       console.error(error);
