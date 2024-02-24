@@ -154,11 +154,10 @@ async function sendComment(page, i, setupName){
         await page.waitForSelector('input#react-select-4-input');
         await page.type('input#react-select-4-input', commentTemplate);
   
-        await new Promise(resolve => setTimeout(resolve, 1000)); //1 sec delay
+        await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
         await page.keyboard.press('Enter');
-        await new Promise(resolve => setTimeout(resolve, 1000)); //1 sec delay
-  
-  
+
+        await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
         await page.waitForSelector("div.ql-editor");
         await page.click("div.ql-editor");
         await page.type("div.ql-editor", commentTemp);
@@ -365,6 +364,7 @@ async function closer(page, i, setupName){
         return false;
       }
 
+      await new Promise(resolve => setTimeout(resolve, 4000)); //4 sec delay
 
       //click signature document
       const signatureSelect = xPathClick(page, `//span[contains(@class, 'info-block__text') and contains(text(), '${signature}')]`);
@@ -372,7 +372,7 @@ async function closer(page, i, setupName){
         clientArray[i][closerExcel] = "N"; 
         return false;
       }
-      await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+      await new Promise(resolve => setTimeout(resolve, 4000)); //4 sec delay
       
 
 
