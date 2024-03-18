@@ -953,6 +953,8 @@ async function justCreateInvoice(page, i, setupName){
         await page.type('input.simple-input[type="text"][autocapitalize="off"][autocomplete="off"][value="0.00"]', clientArray[i].InvoiceAmount.toString());
         
         await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
+        await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
         // //create invoice
         // await page.keyboard.press('Enter');
         // await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
@@ -967,6 +969,8 @@ async function justCreateInvoice(page, i, setupName){
   
         //wait for save
         await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
+        await new Promise(resolve => setTimeout(resolve, 3000)); //3 sec delay
+
   
         console.log('Just Send Invoice Created.');
 
