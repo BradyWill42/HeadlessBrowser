@@ -61,8 +61,8 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#form-field-email', 'will2828@purdue.edu');
-      await page.type('input#form-field-password', '$zM{8$;@Z<+8@O=UU;><');
+      await page.type('input#form-field-email', 'jjoconnor@greenoakfinancial.com');
+      await page.type('input#form-field-password', '?RAy05X?IDJa5dJ0(#Ey');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
       console.error(error);
@@ -323,6 +323,7 @@ async function closer(page, i, setupName){
       
 
       await new Promise(resolve => setTimeout(resolve, 1000)); //1 sec delay
+      await new Promise(resolve => setTimeout(resolve, 2000)); //JJ - another 2 sec delay
 
 
       //click name
@@ -365,6 +366,7 @@ async function closer(page, i, setupName){
       }
 
       await new Promise(resolve => setTimeout(resolve, 4000)); //4 sec delay
+      await new Promise(resolve => setTimeout(resolve, 3000)); //JJ - another 3 sec delay
 
       //click signature document
       const signatureSelect = xPathClick(page, `//span[contains(@class, 'info-block__text') and contains(text(), '${signature}')]`);
@@ -373,6 +375,7 @@ async function closer(page, i, setupName){
         return false;
       }
       await new Promise(resolve => setTimeout(resolve, 4000)); //4 sec delay
+      await new Promise(resolve => setTimeout(resolve, 3000)); //JJ - another 3 sec delay
       
 
 
@@ -389,6 +392,7 @@ async function closer(page, i, setupName){
       }
 
       await new Promise(resolve => setTimeout(resolve, timeout)); //5 sec delay
+      await new Promise(resolve => setTimeout(resolve, 3000)); //JJ - another 3 sec delay
 
 
       console.log("Signature Page Linked.");
