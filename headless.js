@@ -61,8 +61,8 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#form-field-email', 'will2828@purdue.edu');
-      await page.type('input#form-field-password', '$zM{8$;@Z<+8@O=UU;><');
+      await page.type('input#form-field-email', 'jjoconnor@greenoakfinancial.com');
+      await page.type('input#form-field-password', '?RAy05X?IDJa5dJ0(#Ey');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
       console.error(error);
@@ -376,7 +376,7 @@ async function closer(page, i, setupName){
       
 
 
-      const subSignature = xPathClick(page, "//button[@data-test='submit-button' and text()='Save']");
+      const subSignature = xPathClick(page, "//button[@data-test='save-button' and text()='Save']");
       if(!subSignature){
         clientArray[i][closerExcel] = "N";
         return false;
