@@ -61,8 +61,8 @@ async function startAndLogin(){
     await page.goto('https://portal.greenoakfinancial.com/login'); // Navigate to Login Page
   
     try { //Login to GOF
-      await page.type('input#form-field-email', 'will2828@purdue.edu');
-      await page.type('input#form-field-password', '$zM{8$;@Z<+8@O=UU;><');
+      await page.type('input#form-field-email', 'example@example.com');
+      await page.type('input#form-field-password', 'password');
       await page.click('button[type="submit"]');
     } catch (error) { //If already logged in, skip and login
       console.error(error);
@@ -88,7 +88,7 @@ async function sendOutEmail(page, i, setupName){
         if(setupName === clientArray[i].ClientName){ //check names match
           console.log("Names Match.");
           console.log("Sending Email...");
-          await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
+          await page.goto('https://portal.firm.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
           await page.waitForSelector('div.block-container .btn');
           await page.click('div.block-container .btn');
     
@@ -147,7 +147,7 @@ async function sendComment(page, i, setupName){
       if(setupName === clientArray[i].ClientName){ //check names match
         console.log("Names Match.");
         console.log("Sending Email...");
-        await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
+        await page.goto('https://portal.firm.com/app/clients/' + clientArray[i].ClientID + '/mailbox/inbox'); // Navigate to Client Inbox
         await page.waitForSelector('div.block-container .btn');
         await page.click('div.block-container .btn');
   
@@ -306,7 +306,7 @@ async function closer(page, i, setupName){
   if( (completeCloser == null || completeCloser.toLocaleLowerCase() != 'none') && setupName === clientArray[i].ClientName ){
     try{ //Ensure Page domain exists
       console.log("Navigate to Jobs Page.");
-      await page.goto('https://portal.greenoakfinancial.com/app/jobs/'); // Navigate to Jobs 
+      await page.goto('https://portal.firm.com/app/jobs/'); // Navigate to Jobs 
     } catch (error) { //catch case if no job page exists
       console.log("Job Page does not exist.");
       console.error(error);
@@ -1015,7 +1015,7 @@ async function xPathClick(page, xpath){
 
 async function precheck(page, i){
   try{ //Ensure Page domain exists
-    await page.goto('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/profile'); // Navigate to Client Profile
+    await page.goto('https://portal.firm.com/app/clients/' + clientArray[i].ClientID + '/profile'); // Navigate to Client Profile
   } catch (error) { //catch case if no domain exists
     console.log("Client Profile does not exist.");
     console.error(error);
@@ -1025,7 +1025,7 @@ async function precheck(page, i){
   try{ //Check that page exists
     await page.waitForSelector('.avatar__name', { timeout });
   } catch (error) { // catch case if page doesnt exist
-    console.log('https://portal.greenoakfinancial.com/app/clients/' + clientArray[i].ClientID + '/profile' + ' does not exist');
+    console.log('https://portal.firm.com/app/clients/' + clientArray[i].ClientID + '/profile' + ' does not exist');
     console.log("Page Check Failed.");
     console.error(error);
     return false;
